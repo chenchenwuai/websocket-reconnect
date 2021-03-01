@@ -4,7 +4,8 @@
   "description": "websocket reconnect",
   "main": "lib/websocket-reconnect.cjs.js",
   "module": "lib/websocket-reconnect.esm.js",
-  "browser": "lib/websocket-reconnect.umd.js",
+	"browser": "lib/websocket-reconnect.umd.js",
+	"types": "types/index.d.ts",
   "files": [
     "lib/**/*",
     "src/**/*",
