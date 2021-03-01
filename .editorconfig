@@ -1,0 +1,17 @@
+# http://editorconfig.org
+# 属性解释 https://github.com/editorconfig/editorconfig/wiki/EditorConfig-Properties
+
+# 控制 .editorconfig 是否生效的字段
+root = true
+
+# 对所有文件生效
+[*]
+# 空格形式缩进2空格
+indent_style = tab
+indent_size = 2
+# utf-8编码
+charset = utf-8
+# 去除结尾空格
+trim_trailing_whitespace = true
+# 结尾插入新行
+insert_final_newline = true

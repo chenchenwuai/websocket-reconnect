@@ -1,0 +1,73 @@
+{
+  "name": "websocket-reconnect",
+  "version": "0.0.1",
+  "description": "websocket reconnect",
+  "main": "lib/websocket-reconnect.cjs.js",
+  "module": "lib/websocket-reconnect.esm.js",
+  "browser": "lib/websocket-reconnect.umd.js",
+  "files": [
+    "lib/**/*",
+    "src/**/*",
+    "types/**/*"
+  ],
+  "scripts": {
+    "build": "rimraf lib && rollup -c && npm run build:type",
+    "build:type": "rimraf types && tsc -p ./tsconfig.type.json",
+    "eslint": "eslint --ext .ts --fix ./src",
+    "test": "jest --no-cache",
+		"api": "api-extractor run",
+		"version":"standard-version",
+		"prepublishOnly": "npm test && npm run eslint && npm run build && npm run version",
+		"release":"npm pub && git push"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/chenchenwuai/websocket-reconnect"
+  },
+  "author": "chenwuai",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/chenchenwuai/websocket-reconnect/issues"
+  },
+  "homepage": "https://github.com/chenchenwuai/websocket-reconnect#readme",
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/core": "^7.13.1",
+    "@babel/preset-env": "^7.13.5",
+    "@babel/preset-typescript": "^7.13.0",
+    "@microsoft/api-extractor": "^7.13.1",
+    "@rollup/plugin-typescript": "^2.0.1",
+    "@types/jest": "^24.9.1",
+    "@typescript-eslint/eslint-plugin": "^4.15.2",
+    "@typescript-eslint/parser": "^4.15.2",
+    "eslint": "^7.20.0",
+    "husky": "^4.2.5",
+    "jest": "^26.6.3",
+    "lint-staged": "^10.2.11",
+    "rimraf": "^2.6.2",
+    "rollup": "^2.39.1",
+    "rollup-plugin-babel": "^4.4.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-filesize": "^9.1.1",
+    "rollup-plugin-terser": "^7.0.2",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "standard-version": "^8.0.2",
+    "terser": "^5.6.0",
+    "ts-jest": "^26.5.2",
+    "tslib": "^2.1.0",
+    "typescript": "^3.8.3",
+    "ws": "^7.4.3"
+  },
+  "sideEffects": false,
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "src/**/*.{js,ts}": [
+      "eslint --fix",
+      "git add"
+    ]
+  }
+}
