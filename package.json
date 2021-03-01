@@ -1,6 +1,6 @@
 {
   "name": "websocket-reconnect",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "websocket reconnect",
   "main": "lib/websocket-reconnect.cjs.js",
   "module": "lib/websocket-reconnect.esm.js",
@@ -15,10 +15,10 @@
     "build:type": "rimraf types && tsc -p ./tsconfig.type.json",
     "eslint": "eslint --ext .ts --fix ./src",
     "test": "jest --no-cache",
-		"api": "api-extractor run",
-		"version":"standard-version",
-		"prepublishOnly": "npm test && npm run eslint && npm run build && npm run version",
-		"release":"npm pub && git push"
+    "api": "api-extractor run",
+    "version": "standard-version",
+    "prepublishOnly": "npm test && npm run eslint && npm run build && npm run version",
+    "release": "npm pub && git push"
   },
   "repository": {
     "type": "git",
