@@ -1,6 +1,6 @@
 {
   "name": "websocket-reconnect",
-  "version": "0.0.3",
+  "version": "1.0.0",
   "description": "websocket reconnect",
   "main": "lib/websocket-reconnect.cjs.js",
   "module": "lib/websocket-reconnect.esm.js",
