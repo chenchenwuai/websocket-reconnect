@@ -22,4 +22,5 @@
  * }
  */
 const wsr = new WebsocketReconnect(url,protocols,options)
+
 ```
