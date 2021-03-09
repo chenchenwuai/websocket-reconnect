@@ -18,8 +18,7 @@
     "test": "jest --no-cache",
     "api": "api-extractor run",
     "version": "standard-version",
-    "prepublishOnly": "npm test && npm run eslint && npm run build && npm run version",
-    "release": "npm pub && git push"
+    "release": "npm test && npm run eslint && npm run build && npm run version && npm pub && git push"
   },
   "repository": {
     "type": "git",
