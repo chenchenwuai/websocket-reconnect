@@ -51,6 +51,10 @@ export declare type Options = {
     maxRetries?: number;
     maxEnqueuedMessages?: number;
     startClosed?: boolean;
+    enableHeartbeat?: boolean;
+    pingTimeout?: number;
+    pongTimeout?: number;
+    pingMsg?: Message;
     debug?: boolean;
 };
 export declare type UrlProvider = string | (() => string) | (() => Promise<string>);
@@ -65,6 +69,8 @@ export default class WebsocketReconnect {
     private _shouldReconnect;
     private _connectLock;
     private _closeCalled;
+    private _pingIntervalId;
+    private _pongTimeoutId;
     private readonly _url;
     private readonly _protocols;
     private readonly _options;
@@ -110,5 +116,8 @@ export default class WebsocketReconnect {
     private _debug;
     private _addEventListeners;
     private _removeListeners;
+    private _heartCheck;
+    private _heartStart;
+    private _heartReset;
     private _clearTimeouts;
 }

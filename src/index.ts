@@ -54,6 +54,10 @@ export type Options = {
 	maxRetries?: number
 	maxEnqueuedMessages?: number
 	startClosed?: boolean
+	enableHeartbeat?: boolean,
+	pingTimeout?: number,
+	pongTimeout?: number,
+	pingMsg?: Message,
 	debug?: boolean
 }
 export type UrlProvider = string | (() => string) | (() => Promise<string>)
@@ -67,6 +71,10 @@ const DEFAULT = {
 	maxRetries: Infinity,
 	maxEnqueuedMessages: Infinity,
 	startClosed: false,
+	enableHeartbeat: false,
+	pingTimeout: 10000,
+	pongTimeout: 10000,
+	pingMsg: '\r\n',
 	debug: false
 }
 
@@ -96,6 +104,8 @@ export default class WebsocketReconnect {
 	private _shouldReconnect = true
 	private _connectLock = false
 	private _closeCalled = false
+	private _pingIntervalId: any = 0
+	private _pongTimeoutId: any = 0
 
 	private readonly _url: UrlProvider
 	private readonly _protocols: string | string[]
@@ -392,6 +402,8 @@ export default class WebsocketReconnect {
 			this._ws.binaryType = this._binaryType
 		}
 
+		this._options.enableHeartbeat && this._heartCheck()
+
 		this._messageQueue.forEach(message => this._ws?.send(message))
 		this._messageQueue = []
 
@@ -507,8 +519,39 @@ export default class WebsocketReconnect {
 		this._ws.removeEventListener('error', this._handleError)
 	}
 
+	private _heartCheck () {
+		this._heartReset()
+		this._heartStart()
+	}
+
+	private _heartStart () {
+		const {
+			enableHeartbeat = DEFAULT.enableHeartbeat,
+			pingTimeout = DEFAULT.pingTimeout,
+			pongTimeout = DEFAULT.pongTimeout,
+			pingMsg = DEFAULT.pingMsg
+		} = this._options
+		if (!this._shouldReconnect && !enableHeartbeat) {
+			return
+		}
+		this._pingIntervalId = setInterval(() => {
+			this._debug('ping')
+			this.send(pingMsg)
+			this._pongTimeoutId = setTimeout(() => {
+				this._debug('Pong Timeout')
+				this.close()
+			}, pongTimeout)
+		}, pingTimeout)
+	}
+
+	private _heartReset () {
+		clearInterval(this._pingIntervalId)
+		clearTimeout(this._pongTimeoutId)
+	}
+
 	private _clearTimeouts (): void {
 		clearTimeout(this._connectTimeout)
 		clearTimeout(this._uptimeTimeout)
+		this._heartReset()
 	}
 }
