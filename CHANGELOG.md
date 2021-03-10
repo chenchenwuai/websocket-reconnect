@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.1.0...v1.1.1) (2021-03-10)
+
+
+### Bug Fixes
+
+* **core:** 修复子类不能访问_options的问题 ([9847513](https://github.com/chenchenwuai/websocket-reconnect/commit/98475135f0161ed3f1ce71bfd8ddc366ae3d847a))
+
 ## [1.1.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.0.5...v1.1.0) (2021-03-10)
 
 
