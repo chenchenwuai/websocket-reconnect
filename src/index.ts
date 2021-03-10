@@ -109,7 +109,7 @@ export default class WebsocketReconnect {
 
 	private readonly _url: UrlProvider
 	private readonly _protocols: string | string[]
-	private readonly _options: Options
+	protected readonly _options: Options
 
 	constructor (url: UrlProvider, protocols?: string | string[], options: Options = {}) {
 		this._url = url
