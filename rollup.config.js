@@ -4,6 +4,7 @@ const babel = require('rollup-plugin-babel')
 import typescript from 'typescript'
 import typescript2 from 'rollup-plugin-typescript2'
 import filesize from 'rollup-plugin-filesize'
+import { terser } from 'rollup-plugin-terser'
 const pkg = require('./package.json')
 
 const resolve = function (...args) {
@@ -32,7 +33,8 @@ export default {
 			exclude: 'node_modules/**',
 			extensions
 		}),
-		filesize()
+		filesize(),
+		terser()
 	],
 
 	output: [
