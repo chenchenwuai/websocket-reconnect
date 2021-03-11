@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.1.3...v1.2.0) (2021-03-11)
+
+
+### Features
+
+* 增加压缩功能 ([c554c42](https://github.com/chenchenwuai/websocket-reconnect/commit/c554c42344963e94555077504293bd3126785cd4))
+
 ### [1.1.3](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.1.2...v1.1.3) (2021-03-11)
 
 
