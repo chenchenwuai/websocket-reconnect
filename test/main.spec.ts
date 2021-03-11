@@ -69,17 +69,6 @@ test('getters when not ready', done => {
     };
 });
 
-test('debug on', done => {
-    const logSpy = jest.spyOn(console, 'log').mockReturnValue();
-
-    const ws = new ReconnectingWebSocket(URL, undefined, {maxRetries: 0, debug: true});
-
-    ws.onerror = () => {
-        expect(logSpy).toHaveBeenCalledWith('[WSR]', 'connect', 0);
-        done();
-    };
-});
-
 test('debug off', done => {
     const logSpy = jest.spyOn(console, 'log').mockReturnValue();
 
