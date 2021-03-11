@@ -75,7 +75,7 @@ test('debug on', done => {
     const ws = new ReconnectingWebSocket(URL, undefined, {maxRetries: 0, debug: true});
 
     ws.onerror = () => {
-        expect(logSpy).toHaveBeenCalledWith('WSR', 'connect', 0);
+        expect(logSpy).toHaveBeenCalledWith('[WSR]', 'connect', 0);
         done();
     };
 });
