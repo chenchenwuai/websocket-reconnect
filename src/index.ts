@@ -109,12 +109,28 @@ export default class WebsocketReconnect {
 
 	private readonly _url: UrlProvider
 	private readonly _protocols: string | string[]
-	protected readonly _options: Options
+	protected readonly _options: Required<Options>
 
 	constructor (url: UrlProvider, protocols?: string | string[], options: Options = {}) {
 		this._url = url
 		this._protocols = protocols ?? ''
-		this._options = options
+		this._options = {
+			WebSocket: getGlobalWebSocket(),
+			maxReconnectionDelay: 10000,
+			minReconnectionDelay: 1000 + Math.random() * 4000,
+			minUptime: 5000,
+			reconnectionDelayGrowFactor: 1.3,
+			connectionTimeout: 4000,
+			maxRetries: Infinity,
+			maxEnqueuedMessages: Infinity,
+			startClosed: false,
+			enableHeartbeat: false,
+			pingTimeout: 10000,
+			pongTimeout: 10000,
+			pingMsg: '\r\n',
+			debug: false,
+			...options
+		}
 		if (this._options.startClosed) {
 			this._shouldReconnect = false
 		}
@@ -257,7 +273,7 @@ export default class WebsocketReconnect {
 			this._debug('send', data)
 			this._ws.send(data)
 		} else {
-			const { maxEnqueuedMessages = DEFAULT.maxEnqueuedMessages } = this._options
+			const { maxEnqueuedMessages } = this._options
 			if (this._messageQueue.length < maxEnqueuedMessages) {
 				this._debug('enqueue', data)
 				this._messageQueue.push(data)
@@ -341,9 +357,9 @@ export default class WebsocketReconnect {
 		this._connectLock = true
 
 		const {
-			maxRetries = DEFAULT.maxRetries,
-			connectionTimeout = DEFAULT.connectionTimeout,
-			WebSocket = getGlobalWebSocket()
+			maxRetries,
+			connectionTimeout,
+			WebSocket
 		} = this._options
 
 		if (this._retryCount >= maxRetries) {
@@ -393,7 +409,7 @@ export default class WebsocketReconnect {
 
 	private _handleOpen = (event: Event) => {
 		this._debug('open event')
-		const { minUptime = DEFAULT.minUptime } = this._options
+		const { minUptime } = this._options
 
 		clearTimeout(this._connectTimeout)
 		this._uptimeTimeout = setTimeout(() => this._acceptOpen(), minUptime)
@@ -451,9 +467,9 @@ export default class WebsocketReconnect {
 
 	private _getNextDelay (): number {
 		const {
-			reconnectionDelayGrowFactor = DEFAULT.reconnectionDelayGrowFactor,
-			minReconnectionDelay = DEFAULT.minReconnectionDelay,
-			maxReconnectionDelay = DEFAULT.maxReconnectionDelay
+			reconnectionDelayGrowFactor,
+			minReconnectionDelay,
+			maxReconnectionDelay
 		} = this._options
 		let delay = 0
 		if (this._retryCount > 0) {
@@ -525,12 +541,7 @@ export default class WebsocketReconnect {
 	}
 
 	private _heartStart () {
-		const {
-			enableHeartbeat = DEFAULT.enableHeartbeat,
-			pingTimeout = DEFAULT.pingTimeout,
-			pongTimeout = DEFAULT.pongTimeout,
-			pingMsg = DEFAULT.pingMsg
-		} = this._options
+		const { enableHeartbeat, pingTimeout, pongTimeout, pingMsg } = this._options
 		if (!this._shouldReconnect && !enableHeartbeat) {
 			return
 		}

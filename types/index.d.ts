@@ -73,7 +73,7 @@ export default class WebsocketReconnect {
     private _pongTimeoutId;
     private readonly _url;
     private readonly _protocols;
-    private readonly _options;
+    protected readonly _options: Required<Options>;
     constructor(url: UrlProvider, protocols?: string | string[], options?: Options);
     get binaryType(): BinaryType;
     set binaryType(value: BinaryType);
