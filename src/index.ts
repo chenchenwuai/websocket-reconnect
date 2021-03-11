@@ -62,22 +62,6 @@ export type Options = {
 }
 export type UrlProvider = string | (() => string) | (() => Promise<string>)
 
-const DEFAULT = {
-	maxReconnectionDelay: 10000,
-	minReconnectionDelay: 1000 + Math.random() * 4000,
-	minUptime: 5000,
-	reconnectionDelayGrowFactor: 1.3,
-	connectionTimeout: 4000,
-	maxRetries: Infinity,
-	maxEnqueuedMessages: Infinity,
-	startClosed: false,
-	enableHeartbeat: false,
-	pingTimeout: 10000,
-	pongTimeout: 10000,
-	pingMsg: '\r\n',
-	debug: false
-}
-
 const getGlobalWebSocket = (): WebSocket | undefined => {
 	if (typeof WebSocket !== 'undefined') {
 		// @ts-ignore
@@ -369,7 +353,7 @@ export default class WebsocketReconnect {
 
 		this._retryCount++
 
-		this._debug('connect', this._retryCount)
+		this._debug('connect times', this._retryCount)
 		this._removeListeners()
 
 		if (!isWebSocket(WebSocket)) {
@@ -430,6 +414,10 @@ export default class WebsocketReconnect {
 	}
 	private _handleMessage = (event: MessageEvent) => {
 		this._debug('message event')
+		if (event.data === this._options.pingMsg || event.data === '') {
+			clearTimeout(this._pongTimeoutId)
+			this._debug('pong')
+		}
 		if (this.onmessage) {
 			this.onmessage(event)
 		}
@@ -478,6 +466,7 @@ export default class WebsocketReconnect {
 				delay = maxReconnectionDelay
 			}
 		}
+		delay = Math.ceil(delay)
 		this._debug('next delay', delay)
 		return delay
 	}
@@ -509,7 +498,7 @@ export default class WebsocketReconnect {
 
 	private _debug (...args: any[]) {
 		if (this._options.debug) {
-			console.log('WSR', ...args)
+			console.log('[WSR]', ...args)
 		}
 	}
 
@@ -528,6 +517,7 @@ export default class WebsocketReconnect {
 		if (!this._ws) {
 			return
 		}
+		this._debug('removeListeners')
 		this._ws.removeEventListener('open', this._handleOpen)
 		this._ws.removeEventListener('message', this._handleMessage)
 		this._ws.removeEventListener('close', this._handleClose)
@@ -550,7 +540,7 @@ export default class WebsocketReconnect {
 			this.send(pingMsg)
 			this._pongTimeoutId = setTimeout(() => {
 				this._debug('Pong Timeout')
-				this.close()
+				this.reconnect()
 			}, pongTimeout)
 		}, pingTimeout)
 	}
