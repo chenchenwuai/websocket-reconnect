@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 export class Event {
 	public target: any;
 	public type: string;
@@ -25,23 +26,30 @@ export class CloseEvent extends Event {
 		this.reason = reason
 	}
 }
+export type ReconnectEventParams = {
+	maxRetries: number,
+	retryCount: number
+}
 export interface WebSocketEventMap {
 	close: CloseEvent;
 	error: ErrorEvent;
 	message: MessageEvent;
 	open: Event;
+	reconnect: ReconnectEventParams;
 }
 export interface WebSocketEventListenerMap {
 	close: (event: CloseEvent) => void | {handleEvent: (event: CloseEvent) => void};
 	error: (event: ErrorEvent) => void | {handleEvent: (event: ErrorEvent) => void};
 	message: (event: MessageEvent) => void | {handleEvent: (event: MessageEvent) => void};
 	open: (event: Event) => void | {handleEvent: (event: Event) => void};
+	reconnect: (options: ReconnectEventParams) => void;
 }
 export type ListenersMap = {
 	error: Array<WebSocketEventListenerMap['error']>;
 	message: Array<WebSocketEventListenerMap['message']>;
 	open: Array<WebSocketEventListenerMap['open']>;
 	close: Array<WebSocketEventListenerMap['close']>;
+	reconnect: Array<WebSocketEventListenerMap['reconnect']>;
 }
 export type Message = string | ArrayBufferLike | Blob | ArrayBufferView
 export type Options = {
@@ -79,7 +87,8 @@ export default class WebsocketReconnect {
 		error: [],
 		message: [],
 		open: [],
-		close: []
+		close: [],
+		reconnect: []
 	}
 
 	private _retryCount = -1
@@ -133,6 +142,17 @@ export default class WebsocketReconnect {
 		if (this._ws) {
 			this._ws.binaryType = value
 		}
+	}
+	/**
+	 * Returns a websocket Message Array.
+	 *
+	 * Can be set.
+	 */
+	get messageQueue (): Message[] {
+		return this._messageQueue
+	}
+	set messageQueue (value: Message[]) {
+		this._messageQueue = value
 	}
 
 	/**
@@ -230,6 +250,11 @@ export default class WebsocketReconnect {
 	 * this indicates that the connection is ready to send and receive data
 	 */
 	public onopen: ((event: Event) => void) | null = null
+	/**
+	 * An event listener to be called when the WebSocket connection's readyState changes to OPEN;
+	 * this indicates that the connection is ready to send and receive data
+	 */
+	public onreconnect: ((options: ReconnectEventParams) => void) | null = null
 
 	/**
 	 * Closes the WebSocket connection or connection attempt, if any. If the connection is already
@@ -328,9 +353,11 @@ export default class WebsocketReconnect {
 		this._retryCount = -1
 		if (!this._ws || this._ws.readyState === WebSocket.CLOSED) {
 			this._connect()
+			this._handleReconnect()
 		} else {
 			this._disconnect(code, reason)
 			this._connect()
+			this._handleReconnect()
 		}
 	}
 
@@ -445,6 +472,24 @@ export default class WebsocketReconnect {
 		this._listeners.error.forEach(listener => this._callEventListener(event, listener))
 
 		this._connect()
+	}
+	private _handleReconnect = () => {
+		if (this._connectLock || !this._shouldReconnect) {
+			return
+		}
+		this._debug('reconnect event')
+		const {	maxRetries } = this._options
+
+		if (this.onreconnect) {
+			this.onreconnect({
+				maxRetries,
+				retryCount: this._retryCount
+			})
+		}
+		this._listeners.reconnect.forEach(listener => this._callEventListener({
+			maxRetries,
+			retryCount: this._retryCount
+		}, listener))
 	}
 
 	private _wait (): Promise<void> {

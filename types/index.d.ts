@@ -14,11 +14,16 @@ export declare class CloseEvent extends Event {
     wasClean: boolean;
     constructor(code: number | undefined, reason: string | undefined, target: any);
 }
+export declare type ReconnectEventParams = {
+    maxRetries: number;
+    retryCount: number;
+};
 export interface WebSocketEventMap {
     close: CloseEvent;
     error: ErrorEvent;
     message: MessageEvent;
     open: Event;
+    reconnect: ReconnectEventParams;
 }
 export interface WebSocketEventListenerMap {
     close: (event: CloseEvent) => void | {
@@ -33,12 +38,14 @@ export interface WebSocketEventListenerMap {
     open: (event: Event) => void | {
         handleEvent: (event: Event) => void;
     };
+    reconnect: (options: ReconnectEventParams) => void;
 }
 export declare type ListenersMap = {
     error: Array<WebSocketEventListenerMap['error']>;
     message: Array<WebSocketEventListenerMap['message']>;
     open: Array<WebSocketEventListenerMap['open']>;
     close: Array<WebSocketEventListenerMap['close']>;
+    reconnect: Array<WebSocketEventListenerMap['reconnect']>;
 };
 export declare type Message = string | ArrayBufferLike | Blob | ArrayBufferView;
 export declare type Options = {
@@ -77,6 +84,8 @@ export default class WebsocketReconnect {
     constructor(url: UrlProvider, protocols?: string | string[], options?: Options);
     get binaryType(): BinaryType;
     set binaryType(value: BinaryType);
+    get messageQueue(): Message[];
+    set messageQueue(value: Message[]);
     get retryCount(): number;
     get bufferedAmount(): number;
     get extensions(): string;
@@ -95,6 +104,7 @@ export default class WebsocketReconnect {
     onerror: ((event: ErrorEvent) => any) | null;
     onmessage: ((message: MessageEvent) => void) | null;
     onopen: ((event: Event) => void) | null;
+    onreconnect: ((options: ReconnectEventParams) => void) | null;
     close(code?: number, reason?: string): void;
     send(data: Message): void;
     addEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap[T]): void;
@@ -108,6 +118,7 @@ export default class WebsocketReconnect {
     private _handleMessage;
     private _handleClose;
     private _handleError;
+    private _handleReconnect;
     private _wait;
     private _getNextDelay;
     private _getNextUrl;
