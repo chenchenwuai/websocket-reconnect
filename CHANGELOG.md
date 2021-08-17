@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.2.0...v1.3.0) (2021-08-17)
+
+
+### Features
+
+* 增加重连回调函数；增加messageQueue属性 ([ce61b63](https://github.com/chenchenwuai/websocket-reconnect/commit/ce61b6380d8b689a94843c574739ef239cfb511a))
+
 ## [1.2.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.1.3...v1.2.0) (2021-03-11)
 
 
