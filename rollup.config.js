@@ -33,8 +33,7 @@ export default {
 			exclude: 'node_modules/**',
 			extensions
 		}),
-		filesize(),
-		terser()
+		filesize()
 	],
 
 	output: [
@@ -43,25 +42,27 @@ export default {
 			// 生成的文件名和路径
 			// package.json的main字段, 也就是模块的入口文件
 			file: pkg.main,
-			banner
+			banner,
+			plugins: [terser({ compress: { drop_console: true }})]
 		},
 		{
 			format: 'es',
 			// rollup和webpack识别的入口文件, 如果没有该字段, 那么会去读取main字段
 			file: pkg.module,
-			banner
+			banner,
+			sourcemap: true
 		},
 		{
 			format: 'umd',
 			name: 'WebsocketReconnect',
 			file: pkg.browser,
 			banner,
-			sourcemap: true
+			plugins: [terser()]
 		},
 		{
 			file: 'lib/websocket-reconnect-iife.js',
 			format: 'iife',
-			name: 'ReconnectingWebSocket'
+			name: 'WebsocketReconnect'
 		}
 	]
 }

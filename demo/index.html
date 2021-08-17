@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+
+<style>
+    .logs {
+        padding: 40px 0 0 40px;
+    }
+
+    .logs div {
+        line-height: 26px;
+        font-size: 16px;
+    }
+
+    .brown {
+        color: brown;
+        font-size: 14px!important;
+    }
+    .cadetblue{
+        color: cadetblue;
+    }
+    .chocolate{
+        color: chocolate;
+    }
+    .gray {
+        color: #666666;
+    }
+</style>
+
+<body style='padding:20px;'>
+<script src="../lib/websocket-reconnect-iife.js"></script>
+<!-- <script src="../lib/websocket-reconnect.umd.js"></script> -->
+<script>
+		var url = 'ws://192.168.0.120:8000';
+		var wcs_ws = new WebsocketReconnect(url,[],{
+			minReconnectionDelay:3000,
+			reconnectionDelayGrowFactor:1.1,
+			enableHeartbeat:true,
+			debug:true
+		});
+		console.log(wcs_ws)
+
+		wcs_ws.onopen = function () {
+				console.log('connect success');
+				setTimeout(() => {
+					wcs_ws.close()
+				}, 30000);
+		}
+		wcs_ws.onclose = function (e) {
+				console.log('onclose',e);
+		}
+		wcs_ws.onerror = function (e) {
+				console.log('onerror',e);
+		}
+		wcs_ws.onmessage = function (e) {
+				console.log('onmessage',e);
+				console.log(JSON.parse(e.data))
+				const message= JSON.parse(e.data)
+		}
+		wcs_ws.onreconnect = function (e) {
+				console.log('onreconnect',e);
+		}
+</script>
+</body>
+
+</html>
