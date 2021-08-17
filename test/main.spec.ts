@@ -1,6 +1,6 @@
 // @ts-ignore
 import WebSocket from 'ws';
-import ReconnectingWebSocket, {ErrorEvent} from '../src';
+import WebsocketReconnect from '../src';
 import {spawn} from 'child_process';
 
 const PORT = 50123;
@@ -19,34 +19,34 @@ afterEach(() => {
 test('throws with invalid constructor', () => {
     delete (global as any).WebSocket;
     expect(() => {
-        new ReconnectingWebSocket(URL, undefined, {WebSocket: 123, maxRetries: 0});
+        new WebsocketReconnect(URL, undefined, {WebSocket: 123, maxRetries: 0});
     }).toThrow();
 });
 
 test('throws with missing constructor', () => {
     delete (global as any).WebSocket;
     expect(() => {
-        new ReconnectingWebSocket(URL, undefined, {maxRetries: 0});
+        new WebsocketReconnect(URL, undefined, {maxRetries: 0});
     }).toThrow();
 });
 
 test('throws with non-constructor object', () => {
     (global as any).WebSocket = {};
     expect(() => {
-        new ReconnectingWebSocket(URL, undefined, {maxRetries: 0});
+        new WebsocketReconnect(URL, undefined, {maxRetries: 0});
     }).toThrow();
 });
 
 test('throws if not created with `new`', () => {
     expect(() => {
         // @ts-ignore
-        ReconnectingWebSocket(URL, undefined);
+        WebsocketReconnect(URL, undefined);
     }).toThrow(TypeError);
 });
 
 test('global WebSocket is used if available', done => {
     // @ts-ignore
-    const ws = new ReconnectingWebSocket(URL, undefined, {WebSocket, maxRetries: 0});
+    const ws = new WebsocketReconnect(URL, undefined, {WebSocket, maxRetries: 0});
     ws.onerror = () => {
         // @ts-ignore
         expect(ws._ws instanceof WebSocket).toBe(true);
@@ -55,7 +55,7 @@ test('global WebSocket is used if available', done => {
 });
 
 test('getters when not ready', done => {
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         maxRetries: 0,
     });
     expect(ws.bufferedAmount).toBe(0);
@@ -72,7 +72,7 @@ test('getters when not ready', done => {
 test('debug off', done => {
     const logSpy = jest.spyOn(console, 'log').mockReturnValue();
 
-    const ws = new ReconnectingWebSocket(URL, undefined, {maxRetries: 0});
+    const ws = new WebsocketReconnect(URL, undefined, {maxRetries: 0});
 
     ws.onerror = () => {
         expect(logSpy).not.toHaveBeenCalled();
@@ -82,7 +82,7 @@ test('debug off', done => {
 
 test('pass WebSocket via options', done => {
     delete (global as any).WebSocket;
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         WebSocket,
         maxRetries: 0,
     });
@@ -95,7 +95,7 @@ test('pass WebSocket via options', done => {
 
 test('URL provider', async () => {
     const url = 'example.com';
-    const ws = new ReconnectingWebSocket(URL, undefined, {maxRetries: 0});
+    const ws = new WebsocketReconnect(URL, undefined, {maxRetries: 0});
 
     // @ts-ignore - accessing private property
     expect(await ws._getNextUrl(url)).toBe(url);
@@ -114,7 +114,7 @@ test('URL provider', async () => {
 });
 
 test('connection status constants', () => {
-    const ws = new ReconnectingWebSocket(URL, undefined, {maxRetries: 0});
+    const ws = new WebsocketReconnect(URL, undefined, {maxRetries: 0});
 
     expect(ws.CONNECTING).toBe(0);
     expect(ws.OPEN).toBe(1);
@@ -124,7 +124,7 @@ test('connection status constants', () => {
 });
 
 const maxRetriesTest = (count: number, done: () => void) => {
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         maxRetries: count,
         maxReconnectionDelay: 200,
     });
@@ -144,7 +144,7 @@ test('max retries: 1', done => maxRetriesTest(1, done));
 test('max retries: 5', done => maxRetriesTest(5, done));
 
 test('level0 event listeners are kept after reconnect', done => {
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         maxRetries: 4,
         reconnectionDelayGrowFactor: 1.2,
         maxReconnectionDelay: 20,
@@ -171,7 +171,7 @@ test('level0 event listeners are kept after reconnect', done => {
 });
 
 test('immediately-failed connection with 0 maxRetries must not retry', done => {
-    const ws = new ReconnectingWebSocket('ws://255.255.255.255', [], {
+    const ws = new WebsocketReconnect('ws://255.255.255.255', [], {
         maxRetries: 0,
         connectionTimeout: 2000,
         minReconnectionDelay: 100,
@@ -194,7 +194,7 @@ test('immediately-failed connection with 0 maxRetries must not retry', done => {
 });
 
 test('enqueue messages', done => {
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         maxRetries: 0,
     });
     const count = 10;
@@ -209,7 +209,7 @@ test('enqueue messages', done => {
 
 test('respect maximum enqueued messages', done => {
     const queueSize = 2;
-    const ws = new ReconnectingWebSocket(URL, undefined, {
+    const ws = new WebsocketReconnect(URL, undefined, {
         maxRetries: 0,
         maxEnqueuedMessages: queueSize,
     });
