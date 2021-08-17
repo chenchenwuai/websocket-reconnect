@@ -1,74 +1,7 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-export class Event {
-	public target: any;
-	public type: string;
-	constructor (type: string, target: any) {
-		this.target = target
-		this.type = type
-	}
-}
-export class ErrorEvent extends Event {
-	public message: string;
-	public error: Error;
-	constructor (error: Error, target: any) {
-		super('error', target)
-		this.message = error.message
-		this.error = error
-	}
-}
-export class CloseEvent extends Event {
-	public code: number;
-	public reason: string;
-	public wasClean = true;
-	constructor (code = 1000, reason = '', target: any) {
-		super('close', target)
-		this.code = code
-		this.reason = reason
-	}
-}
-export type ReconnectEventParams = {
-	maxRetries: number,
-	retryCount: number
-}
-export interface WebSocketEventMap {
-	close: CloseEvent;
-	error: ErrorEvent;
-	message: MessageEvent;
-	open: Event;
-	reconnect: ReconnectEventParams;
-}
-export interface WebSocketEventListenerMap {
-	close: (event: CloseEvent) => void | {handleEvent: (event: CloseEvent) => void};
-	error: (event: ErrorEvent) => void | {handleEvent: (event: ErrorEvent) => void};
-	message: (event: MessageEvent) => void | {handleEvent: (event: MessageEvent) => void};
-	open: (event: Event) => void | {handleEvent: (event: Event) => void};
-	reconnect: (options: ReconnectEventParams) => void;
-}
-export type ListenersMap = {
-	error: Array<WebSocketEventListenerMap['error']>;
-	message: Array<WebSocketEventListenerMap['message']>;
-	open: Array<WebSocketEventListenerMap['open']>;
-	close: Array<WebSocketEventListenerMap['close']>;
-	reconnect: Array<WebSocketEventListenerMap['reconnect']>;
-}
-export type Message = string | ArrayBufferLike | Blob | ArrayBufferView
-export type Options = {
-	WebSocket?: any
-	maxReconnectionDelay?: number
-	minReconnectionDelay?: number
-	reconnectionDelayGrowFactor?: number
-	minUptime?: number
-	connectionTimeout?: number
-	maxRetries?: number
-	maxEnqueuedMessages?: number
-	startClosed?: boolean
-	enableHeartbeat?: boolean,
-	pingTimeout?: number,
-	pongTimeout?: number,
-	pingMsg?: Message,
-	debug?: boolean
-}
-export type UrlProvider = string | (() => string) | (() => Promise<string>)
+import {
+	Event, ErrorEvent, CloseEvent, ReconnectEventParams, WebSocketEventMap,
+	WebSocketEventListenerMap, ListenersMap, Message, Options, UrlProvider
+} from './type'
 
 const getGlobalWebSocket = (): WebSocket | undefined => {
 	if (typeof WebSocket !== 'undefined') {
@@ -99,6 +32,7 @@ export default class WebsocketReconnect {
 	private _closeCalled = false
 	private _pingIntervalId: any = 0
 	private _pongTimeoutId: any = 0
+	private _nextConnectDelay = 0
 
 	private readonly _url: UrlProvider
 	private readonly _protocols: string | string[]
@@ -353,15 +287,14 @@ export default class WebsocketReconnect {
 		this._retryCount = -1
 		if (!this._ws || this._ws.readyState === WebSocket.CLOSED) {
 			this._connect()
-			this._handleReconnect()
 		} else {
 			this._disconnect(code, reason)
 			this._connect()
-			this._handleReconnect()
 		}
 	}
 
 	private _connect () {
+		this._debug('connect', '_connectLock', this._connectLock, '_shouldReconnect', this._shouldReconnect)
 		if (this._connectLock || !this._shouldReconnect) {
 			return
 		}
@@ -387,7 +320,15 @@ export default class WebsocketReconnect {
 			throw Error('No valid WebSocket class provided')
 		}
 
-		this._wait()
+		const delay = this._getNextDelay()
+		this._nextConnectDelay = delay
+		this._debug('connect wait', delay)
+
+		if (this._retryCount >= 1) {
+			this._handleReconnect()
+		}
+
+		this._wait(delay)
 			.then(() => this._getNextUrl(this._url))
 			.then(url => {
 				if (this._closeCalled) {
@@ -474,27 +415,28 @@ export default class WebsocketReconnect {
 		this._connect()
 	}
 	private _handleReconnect = () => {
-		if (this._connectLock || !this._shouldReconnect) {
-			return
-		}
 		this._debug('reconnect event')
 		const {	maxRetries } = this._options
 
 		if (this.onreconnect) {
 			this.onreconnect({
 				maxRetries,
+				reconnectDelay: this._nextConnectDelay,
 				retryCount: this._retryCount
 			})
 		}
 		this._listeners.reconnect.forEach(listener => this._callEventListener({
 			maxRetries,
+			reconnectDelay: this._nextConnectDelay,
 			retryCount: this._retryCount
 		}, listener))
 	}
 
-	private _wait (): Promise<void> {
+	private _wait (delay = 0): Promise<void> {
 		return new Promise(resolve => {
-			setTimeout(resolve, this._getNextDelay())
+			setTimeout(() => {
+				resolve()
+			}, delay)
 		})
 	}
 
