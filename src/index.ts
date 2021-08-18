@@ -55,6 +55,7 @@ export default class WebsocketReconnect {
 			pingTimeout: 10000,
 			pongTimeout: 10000,
 			pingMsg: '\r\n',
+			outputPingMsg: false,
 			debug: false,
 			...options
 		}
@@ -385,6 +386,9 @@ export default class WebsocketReconnect {
 		if (event.data === this._options.pingMsg || event.data === '') {
 			clearTimeout(this._pongTimeoutId)
 			this._debug('pong')
+			if (!this._options.outputPingMsg) {
+				return
+			}
 		}
 		if (this.onmessage) {
 			this.onmessage(event)

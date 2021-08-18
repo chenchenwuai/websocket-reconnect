@@ -63,6 +63,7 @@ export declare type Options = {
     pingTimeout?: number;
     pongTimeout?: number;
     pingMsg?: Message;
+    outputPingMsg?: boolean;
     debug?: boolean;
 };
 export declare type UrlProvider = string | (() => string) | (() => Promise<string>);

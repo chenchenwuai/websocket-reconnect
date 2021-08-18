@@ -67,6 +67,7 @@ export type Options = {
 	pingTimeout?: number,
 	pongTimeout?: number,
 	pingMsg?: Message,
+	outputPingMsg?: boolean,
 	debug?: boolean
 }
 export type UrlProvider = string | (() => string) | (() => Promise<string>)
