@@ -382,7 +382,6 @@ export default class WebsocketReconnect {
 		this._listeners.open.forEach(listener => this._callEventListener(event, listener))
 	}
 	private _handleMessage = (event: MessageEvent) => {
-		this._debug('message event')
 		if (event.data === this._options.pingMsg || event.data === '') {
 			clearTimeout(this._pongTimeoutId)
 			this._debug('pong')
@@ -390,6 +389,7 @@ export default class WebsocketReconnect {
 				return
 			}
 		}
+		this._debug('message event')
 		if (this.onmessage) {
 			this.onmessage(event)
 		}
