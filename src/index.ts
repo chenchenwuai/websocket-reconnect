@@ -489,7 +489,16 @@ export default class WebsocketReconnect {
 
 	private _debug (...args: any[]) {
 		if (this._options.debug) {
-			console.log('[WSR]', ...args)
+			const d = new Date()
+			let h: string | number = d.getHours()
+			h = h < 10 ? ('0' + h) : h
+			let m: string | number = d.getMinutes()
+			m = m < 10 ? ('0' + m) : m
+			let s: string | number = d.getSeconds()
+			s = s < 10 ? ('0' + s) : s
+			let ms: string | number = d.getMilliseconds()
+			ms = ms < 100 ? (ms < 10 ? ('00' + ms) : ('0' + ms)) : ms
+			console.log('[WSR]', `${h}:${m}:${s}.${ms}`, ...args)
 		}
 	}
 
