@@ -2,7 +2,7 @@
 
 🚀 `websocket-reconnect-pro`。websocket 断开自动重连，基于原生`websocket`扩展实现、无依赖、TypeScript编写、rollup打包、单元测试。
 
-如果帮助到了你，请给我一个star~ 💖，如果你发现bug，请尽情的在下方评论或者提issue，灰常感谢💖
+[GitHub](https://github.com/chenchenwuai/websocket-reconnect)，如果帮助到了你，请给我一个star~ 💖，如果你发现bug，请尽情的提issue或者pr，灰常感谢💖
 
 ## 安装
 ```bash
