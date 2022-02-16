@@ -86,6 +86,8 @@ url: string | (() => string) | (() => Promise<string>)
 |ws|websocket实例|WebSocket|只读|
 |retryCount|当前失败重连的次数|Number|只读|
 |messageQueue|重连后需要发送的消息队列，当调用send方法时，内部的websocket还未建立，或者websocket的readyState不是OPEN时，会把消息push进此数组|Array|可读、可写|
+|onreconnect|用于指定连接失败后的回调函数。|Function|可读、可写|
+|onWebsocketError|用于内部执行new Websocket()时触发的错误回调函数。url无法连接会触发此回调函数|Function|可读、可写|
 
 ### 方法
 
@@ -141,6 +143,7 @@ export default class WebsocketReconnect {
     onmessage: ((message: MessageEvent) => void) | null;
     onopen: ((event: Event) => void) | null;
     onreconnect: ((options: ReconnectEventParams) => void) | null;
+		onWebsocketError: ((error: unknown) => void) | null;
     close(code?: number, reason?: string): void;
     send(data: Message): void;
     addEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap[T]): void;
