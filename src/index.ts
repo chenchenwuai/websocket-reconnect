@@ -142,6 +142,10 @@ export default class WebsocketReconnect {
 		return this._ws ? this._ws.url : ''
 	}
 
+	get ws (): WebSocket | undefined {
+		return this._ws
+	}
+
 	static get CONNECTING (): number {
 		return 0
 	}

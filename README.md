@@ -83,6 +83,7 @@ url: string | (() => string) | (() => Promise<string>)
 
 |属性|说明|类型|备注|
 |---|---|---|---|
+|ws|websocket实例|WebSocket|只读|
 |retryCount|当前失败重连的次数|Number|只读|
 |messageQueue|重连后需要发送的消息队列，当调用send方法时，内部的websocket还未建立，或者websocket的readyState不是OPEN时，会把消息push进此数组|Array|可读、可写|
 
@@ -126,6 +127,7 @@ export default class WebsocketReconnect {
     get protocol(): string;
     get readyState(): number;
     get url(): string;
+		get ws(): WebSocket | undefined;
     static get CONNECTING(): number;
     static get OPEN(): number;
     static get CLOSING(): number;

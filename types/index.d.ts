@@ -27,6 +27,7 @@ export default class WebsocketReconnect {
     get protocol(): string;
     get readyState(): number;
     get url(): string;
+    get ws(): WebSocket | undefined;
     static get CONNECTING(): number;
     static get OPEN(): number;
     static get CLOSING(): number;
