@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.5.0...v1.6.0) (2022-02-16)
+
+
+### Features
+
+* 增加onWebsocketError 回调方法 ([2166ccf](https://github.com/chenchenwuai/websocket-reconnect/commit/2166ccf6eeb6ff1698fd86bec456a5736cbcf03a))
+
 ## [1.5.0](https://github.com/chenchenwuai/websocket-reconnect/compare/v1.4.2...v1.5.0) (2022-02-16)
 
 
