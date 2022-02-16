@@ -195,6 +195,8 @@ export default class WebsocketReconnect {
 	 */
 	public onreconnect: ((options: ReconnectEventParams) => void) | null = null
 
+	public onWebsocketError: ((error: unknown) => void)| null = null
+
 	/**
 	 * Closes the WebSocket connection or connection attempt, if any. If the connection is already
 	 * CLOSED, this method does nothing
@@ -340,11 +342,19 @@ export default class WebsocketReconnect {
 					return
 				}
 				this._debug('connect', { url, protocols: this._protocols })
-				this._ws = this._protocols ? new WebSocket(url, this._protocols) : new WebSocket(url)
-				// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-				this._ws!.binaryType = this._binaryType
-				this._connectLock = false
-				this._addEventListeners()
+				try {
+					this._ws = this._protocols ? new WebSocket(url, this._protocols) : new WebSocket(url)
+					// eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+					this._ws!.binaryType = this._binaryType
+					this._connectLock = false
+					this._addEventListeners()
+				} catch (e) {
+					if (this.onWebsocketError) {
+						this.onWebsocketError(e)
+					} else {
+						throw e
+					}
+				}
 
 				this._connectTimeout = setTimeout(() => this._handleTimeout(), connectionTimeout)
 			})

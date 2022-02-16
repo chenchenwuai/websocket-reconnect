@@ -41,6 +41,7 @@ export default class WebsocketReconnect {
     onmessage: ((message: MessageEvent) => void) | null;
     onopen: ((event: Event) => void) | null;
     onreconnect: ((options: ReconnectEventParams) => void) | null;
+    onWebsocketError: ((error: unknown) => void) | null;
     close(code?: number, reason?: string): void;
     send(data: Message): void;
     addEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap[T]): void;
