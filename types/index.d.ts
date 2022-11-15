@@ -47,6 +47,7 @@ export default class WebsocketReconnect {
     addEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap[T]): void;
     removeEventListener<T extends keyof WebSocketEventListenerMap>(type: T, listener: WebSocketEventListenerMap): void;
     dispatchEvent(event: Event): boolean;
+    sendQueueMessage(): void;
     private _callEventListener;
     reconnect(code?: number, reason?: string): void;
     private _connect;
@@ -56,6 +57,7 @@ export default class WebsocketReconnect {
     private _handleClose;
     private _handleError;
     private _handleReconnect;
+    private _sendQueueMessage;
     private _wait;
     private _getNextDelay;
     private _getNextUrl;

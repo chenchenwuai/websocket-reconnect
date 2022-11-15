@@ -58,6 +58,7 @@ export declare type Options = {
     connectionTimeout?: number;
     maxRetries?: number;
     maxEnqueuedMessages?: number;
+    autoSendQueueMessage?: boolean;
     startClosed?: boolean;
     enableHeartbeat?: boolean;
     pingTimeout?: number;

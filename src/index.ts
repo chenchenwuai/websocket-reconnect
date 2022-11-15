@@ -50,6 +50,7 @@ export default class WebsocketReconnect {
 			connectionTimeout: 4000,
 			maxRetries: Infinity,
 			maxEnqueuedMessages: Infinity,
+			autoSendQueueMessage: true,
 			startClosed: false,
 			enableHeartbeat: false,
 			pingTimeout: 10000,
@@ -271,6 +272,13 @@ export default class WebsocketReconnect {
 		return true
 	}
 
+	/**
+	 * Manually send messages in the queue
+	 */
+	public sendQueueMessage (): void {
+		this._sendQueueMessage()
+	}
+
 	private _callEventListener<T extends keyof WebSocketEventListenerMap> (
 		event: WebSocketEventMap[T],
 		listener: WebSocketEventListenerMap[T]
@@ -370,13 +378,14 @@ export default class WebsocketReconnect {
 			this._ws.close(code, reason)
 			this._handleClose(new CloseEvent(code, reason, this))
 		} catch (error) {
+			// @ts-ignore
 			throw Error(error)
 		}
 	}
 
 	private _handleOpen = (event: Event) => {
 		this._debug('open event')
-		const { minUptime } = this._options
+		const { minUptime, enableHeartbeat, autoSendQueueMessage } = this._options
 
 		clearTimeout(this._connectTimeout)
 		this._uptimeTimeout = setTimeout(() => this._acceptOpen(), minUptime)
@@ -385,10 +394,9 @@ export default class WebsocketReconnect {
 			this._ws.binaryType = this._binaryType
 		}
 
-		this._options.enableHeartbeat && this._heartCheck()
+		enableHeartbeat && this._heartCheck()
 
-		this._messageQueue.forEach(message => this._ws?.send(message))
-		this._messageQueue = []
+		autoSendQueueMessage && this._sendQueueMessage()
 
 		if (this.onopen) {
 			this.onopen(event)
@@ -448,6 +456,11 @@ export default class WebsocketReconnect {
 			reconnectDelay: this._nextConnectDelay,
 			retryCount: this._retryCount
 		}, listener))
+	}
+
+	private _sendQueueMessage (): void {
+		this._messageQueue.forEach(message => this._ws?.send(message))
+		this._messageQueue = []
 	}
 
 	private _wait (delay = 0): Promise<void> {
@@ -512,6 +525,7 @@ export default class WebsocketReconnect {
 			s = s < 10 ? ('0' + s) : s
 			let ms: string | number = d.getMilliseconds()
 			ms = ms < 100 ? (ms < 10 ? ('00' + ms) : ('0' + ms)) : ms
+			// @ts-ignore
 			console.log('[WSR]', `${h}:${m}:${s}.${ms}`, ...args)
 		}
 	}
